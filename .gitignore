@@ -277,3 +277,9 @@ cride/media/
 .env
 .envs/*
 !.envs/.local/
+
+# Space Works
+.idea
+
+# Data
+*.csv
