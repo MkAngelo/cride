@@ -1,10 +1,12 @@
 """Users serializers."""
 
 # Django
+from django.conf import settings
 from django.contrib.auth import authenticate, password_validation
 from django.core.validators import RegexValidator
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string 
+from django.utils import timezone
 
 # Django REST Framework
 from rest_framework import serializers
@@ -12,8 +14,11 @@ from rest_framework.authtoken.models import Token
 from rest_framework.validators import UniqueValidator
 
 # Models
+import jwt
 from cride.users.models import User, Profile
 
+# Utilities
+from datetime import timedelta
 
 class UserModelSerializer(serializers.ModelSerializer):
     """User model serializer."""
@@ -118,4 +123,11 @@ class UserSignUpViewSerializer(serializers.Serializer):
 
     def gen_verification_token(self, user):
         """Create JWT token that the user can use to verify its account"""
-        return 'abc'
+        exp_date = timezone.now() + timedelta(days=3)
+        payload = {
+            'user': user.username,
+            'exp': int(exp_date.timestamp()),
+            'type': 'email.confirmation'
+        }
+        token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+        return token
