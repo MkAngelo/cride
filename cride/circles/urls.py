@@ -1,12 +1,18 @@
 """Cirles urls"""
 
 # Django
-from django.urls import path
+from django.urls import path, include   
+from rest_framework import urlpatterns
+
+# Django REST Framework
+from rest_framework.routers import DefaultRouter
 
 # Views
-from cride.circles.views import create_circle, list_circles
+from .views import circles as circles_views
+
+router = DefaultRouter()
+router.register(r'circles', circles_views.CircleViewSet, basename='cirlce')
 
 urlpatterns = [
-    path('circles/', list_circles),
-    path('create/', create_circle)   
+    path('', include(router.urls))
 ]
