@@ -1,7 +1,6 @@
 """Circle serializers."""
 
 # Django REST Framework
-from django.db.models import fields
 from rest_framework import serializers
 
 # Model
@@ -11,11 +10,13 @@ from cride.circles.models import Circle
 class CircleModelSerializer(serializers.ModelSerializer):
     """Cride model serializer."""
 
-    model = Circle
-    fields = (
-        'id', 'name', 'slug_name',
-        'about', 'picture',
-        'rides_offered', 'rides_taken',
-        'verified', 'is_public',
-        'is_limited', 'members_limit'
-    )
+    class Meta:
+        """Meta class."""
+        model = Circle
+        fields = (
+            'id', 'name', 'slug_name',
+            'about', 'picture',
+            'rides_offered', 'rides_taken',
+            'verified', 'is_public',
+            'is_limited', 'members_limit'
+        )
