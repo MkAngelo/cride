@@ -14,7 +14,7 @@ from cride.users.permissions import IsAccountOwner
 
 # Serializers
 from cride.circles.serializers import (
-    CircleModelSerializer,
+    CircleModelSerializer
 )
 from cride.users.serializers import (
     UserLoginSerializer,
@@ -29,6 +29,7 @@ from cride.circles.models import Circle
 
 
 class UserViewSet(mixins.RetrieveModelMixin,
+                mixins.UpdateModelMixin,
                 viewsets.GenericViewSet):
     """User view set.
     
@@ -43,7 +44,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
         """Assign permissions based on action."""
         if self.action in ['signup', 'login', 'verify']:
             permissions = [AllowAny]
-        elif self.action == 'retrieve':
+        elif self.action in ['retrieve', 'update', 'partial_update']:
             permissions = [IsAuthenticated, IsAccountOwner]
         else:
             permissions = [IsAuthenticated]
