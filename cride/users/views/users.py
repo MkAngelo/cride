@@ -2,6 +2,7 @@
 
 # Django REST Framework
 from rest_framework import status, viewsets, mixins
+from rest_framework import response
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -13,6 +14,7 @@ from rest_framework.permissions import (
 from cride.users.permissions import IsAccountOwner 
 
 # Serializers
+from cride.users.serializers.profiles import ProfileModelSerializer
 from cride.circles.serializers import (
     CircleModelSerializer
 )
@@ -64,6 +66,22 @@ class UserViewSet(mixins.RetrieveModelMixin,
         }
         response.data = data
         return response
+
+    @action(detail=True, methods=['put', 'patch'])
+    def profile(self, request, *args, **kwargs):
+        """Update profile data."""
+        user = self.get_object()
+        profile = user.profile
+        partial = request.method == 'PATCH'
+        serializer = ProfileModelSerializer(
+            profile,
+            data=request.data,
+            partial=partial
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        data = UserModelSerializer(user).data
+        return Response(data)
 
     @action(detail=False, methods=['post'])
     def login(self, request):
