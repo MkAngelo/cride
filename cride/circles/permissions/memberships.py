@@ -34,6 +34,7 @@ class IsSelfMember(BasePermission):
     Expect that "invitation view" implements this permission to restrict only to owner of the invitations.    
     """
     def has_permission(self, request, view):
+        """Let object permission grant access."""
         obj = view.get_object()
         return self.has_object_permission(request, view, obj)
 
