@@ -11,8 +11,7 @@ from cride.circles.models import Circle, Membership, Invitation, invitations
 
 # Permisions
 from rest_framework.permissions import IsAuthenticated
-from cride.circles.permissions.memberships import IsActiveCircleMember
-from cride.circles.permissions.invitations import IsSelfMember
+from cride.circles.permissions.memberships import IsActiveCircleMember, IsSelfMember
 
 # Serializers
 from cride.circles.serializers.memberships import MembershipModelSerializer

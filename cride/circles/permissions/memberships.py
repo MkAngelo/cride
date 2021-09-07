@@ -26,3 +26,18 @@ class IsActiveCircleMember(BasePermission):
         except Membership.DoesNotExist:
             return False
         return True
+
+
+class IsSelfMember(BasePermission):
+    """Allow access only if you are the owner of the invitations.
+
+    Expect that "invitation view" implements this permission to restrict only to owner of the invitations.    
+    """
+    def has_permission(self, request, view):
+        obj = view.get_object()
+        return self.has_object_permission(request, view, obj)
+
+    def has_object_permission(self, request, view, obj):
+        """Verify if the user is owner."""
+
+        return request.user == obj.user
