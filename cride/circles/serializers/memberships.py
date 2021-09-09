@@ -4,15 +4,13 @@
 from django.utils import timezone
 
 # Django REST Framework
-from cride.circles.models import invitations
-from cride.circles.models.invitations import Invitation
 from rest_framework import serializers
 
 # Serializers
 from cride.users.serializers import UserModelSerializer
 
 # Models
-from cride.circles.models import Membership
+from cride.circles.models import Membership, Invitation
 
 
 class MembershipModelSerializer(serializers.ModelSerializer):
@@ -55,11 +53,12 @@ class AddMemberSerializer(serializers.Serializer):
 
     def validate_user(self, data):
         """Verify user isn't already exist."""
-        circle = self.context['cicle']
+        circle = self.context['circle']
         user = data
         q = Membership.objects.filter(circle=circle, user=user)
         if q.exists():
             raise serializers.ValidationError('User is already memeber of this circle')
+        return data
 
     def validate_invitation_code(self,data):
         """Verify code exist and that it is related to the circle"""
@@ -106,7 +105,7 @@ class AddMemberSerializer(serializers.Serializer):
         # Update issuer data
         issuer = Membership.objects.get(user=invitation.issued_by, circle=circle)
         issuer.used_invitations += 1
-        issuer.remainig_invitations += 1
+        issuer.remaining_invitations += 1
         issuer.save()
 
         return member

@@ -106,7 +106,7 @@ class MembershipViewSet(mixins.ListModelMixin,
         """Handle member creation from invitation code."""
         serializer = AddMemberSerializer(
             data=request.data,
-            context={'circle':self.circle, 'request': request}
+            context={'circle': self.circle, 'request': request}
         )
         serializer.is_valid(raise_exception=True)
         member = serializer.save()
