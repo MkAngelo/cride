@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 """Rides views."""
+=======
+"""Rides View"""
+>>>>>>> e3a92190d14ebc38d07bb2789ddd44c0d7565404
 
 # Django REST Framework
 from rest_framework import mixins, viewsets
@@ -7,7 +11,6 @@ from rest_framework.generics import get_object_or_404
 # Permissions
 from rest_framework.permissions import IsAuthenticated
 from cride.circles.permissions.memberships import IsActiveCircleMember
-
 
 # Serializers
 from cride.rides.serializers import CreateRideSerializer
