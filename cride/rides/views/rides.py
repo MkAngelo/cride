@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 """Rides views."""
-=======
-"""Rides View"""
->>>>>>> e3a92190d14ebc38d07bb2789ddd44c0d7565404
 
 # Django REST Framework
 from rest_framework import mixins, viewsets
