@@ -7,6 +7,7 @@ from rest_framework.exceptions import ValidationError
 # Models
 from cride.circles.models import Membership
 from cride.rides.models import Ride
+from cride.users.models import User
 
 # Serializers
 from cride.users.serializers import UserModelSerializer
@@ -107,5 +108,69 @@ class CreateRideSerializer(serializers.ModelSerializer):
         profile = data['offered_by'].profile
         profile.rides_offered += 1
         profile.save()
+
+        return ride
+
+
+class JoinRideSerializer(serializers.ModelSerializer):
+    """Join ride serializer"""
+
+    user = serializers.IntegerField()
+
+    class Meta:
+        """Meta class"""
+        
+        model = Ride
+        fields = ('passengers',)
+
+    def validate_passenger(self, data):
+        """Verify passenger exists and is a circle member."""
+        try:
+            user = User.objects.get(pk=data)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('Invalid passenger.')
+
+        circle = self.context['circle']
+        if not Membership.objects.filter(user=user, circle=circle, is_active=True).exists():
+            raise serializers.ValidationError('User is not an active member of the circle.')
+        
+        self.context['user'] = user
+        return data
+
+    def validate(self, data):
+        """Verify rides allow new passengers."""
+        ride = self.context['ride']
+        if ride.departure_date >= timezone.now():
+            raise serializers.ValidationError("You can't join this ride now.")
+        
+        if ride.available_seats < 1:
+            raise serializers.ValidationError("Ride is already full!")
+
+        if ride.objects.filter(passenger=self.context['user']):
+            raise serializers.ValidationError("Passenger is already in this trip")
+        
+        return data
+
+    def update(self, instance, data):
+        """Add passengers to ride, and update stats""" 
+        ride = self.context['ride']
+        user = self.context['user']
+
+        ride.passengers.add(user)
+
+        # Profile
+        profile = user.profile
+        profile.rides_taken += 1
+        profile.save()
+
+        # Membership
+        member = user.member
+        member.rides_taken += 1
+        member.save()
+
+        # Circle
+        circle = user.circle
+        circle.rides_taken += 1
+        circle.save()
 
         return ride
