@@ -30,8 +30,8 @@ class Qualification(CRideModel):
     )
 
     comments = models.TextField(blank=True)
-    reputation = models.IntegerField(default=5)
+    rating = models.IntegerField(default=5)
 
     def __str__(self):
         """Return username and reputation."""
-        return f'@{self.reputation_user} rated {self.reputation} stars by @{self.rated_user.username}.'
+        return f'@{self.reputation_user} rated {self.rating} stars by @{self.rated_user.username}.'
