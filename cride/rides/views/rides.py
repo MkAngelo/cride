@@ -3,6 +3,7 @@
 # Django REST Framework
 from decimal import Context
 from re import T
+import re
 from typing import Tuple
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
@@ -12,13 +13,14 @@ from rest_framework.response import Response
 # Permissions
 from rest_framework.permissions import IsAuthenticated
 from cride.circles.permissions.memberships import IsActiveCircleMember
+from cride.rides import serializers
 from cride.rides.permissions import IsRideOwner, IsNotRideOwner
 
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
 
 # Serializers
-from cride.rides.serializers import CreateRideSerializer, RideModelSerializer, JoinRideSerializer, EndRideSerializer 
+from cride.rides.serializers import CreateRideSerializer, RideModelSerializer, JoinRideSerializer, EndRideSerializer, QualifyRideSerializer 
 
 # Models
 from cride.circles.models import Circle
@@ -70,6 +72,8 @@ class RideViewSet(mixins.CreateModelMixin,
             return JoinRideSerializer
         if self.action == 'finish':
             return EndRideSerializer
+        if self.action == 'qualify':
+            return QualifyRideSerializer
 
         return RideModelSerializer
 

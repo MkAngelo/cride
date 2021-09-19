@@ -1,12 +1,12 @@
 """Rides serializers."""
 
 # Django REST Framework
+from django.db.models import fields
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 
 # Models
 from cride.circles.models import Membership
-from cride.rides.models import Ride
+from cride.rides.models import Ride, Qualification
 from cride.users.models import User
 
 # Serializers
@@ -200,4 +200,3 @@ class EndRideSerializer(serializers.ModelSerializer):
         if data <= ride.departure_date:
             raise serializers.ValidationError('Ride has not started yet.')
         return data
-
