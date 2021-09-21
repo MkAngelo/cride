@@ -3,10 +3,15 @@
 # Django
 from django.test import TestCase
 
+# Django REST Framework
+from rest_framework.test import APITestCase
+from rest_framework.authtoken.models import Token
+from rest_framework import status
+
 # Model
 from cride.circles.models import Invitation
-from cride.users.models import User
-from cride.circles.models import Circle
+from cride.users.models import User, Profile
+from cride.circles.models import Circle, Membership
 
 
 class InvitationsManagerTestCase(TestCase):
@@ -61,3 +66,40 @@ class InvitationsManagerTestCase(TestCase):
         )
 
         self.assertNotEqual(code, invitation.code)
+
+
+class MemberInvitationsAPITestCase(APITestCase):
+    """Member invitation API test case"""
+    def setUp(self):
+        """Test case setup."""
+        self.user = User.objects.create(
+            username = "PUGA",
+            first_name = "Daniel",
+            last_name = "Puga",
+            email = "d@mail.com",
+            password='root1234'
+        )
+        self.circle = Circle.objects.create(
+            name='Facultad de Ciencias',
+            slug_name='fciencias',
+            about='Grupo oficial de la Facultad de Ciencias UNAM',
+            verified=True
+        )
+        self.profile = Profile.objects.create(user=self.user)
+        self.membership = Membership.objects.create(
+            user=self.user,
+            profile=self.profile,
+            circle=self.circle,
+            remaining_invitations=10
+        )
+        self.token = Token.objects.create(user=self.user).key
+        self.client.credentials(HTTP_AUTHORIZATION='Token {}'.format(self.token))
+
+    def test_response_success(self):
+        """Verify request secceed."""
+        url = '/circles/{}/members/{}/invitations/'.format(
+            self.circle.slug_name,
+            self.user.username
+        )
+        request = self.client.get(url)
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
