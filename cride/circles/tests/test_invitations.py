@@ -9,7 +9,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status
 
 # Model
-from cride.circles.models import Invitation
+from cride.circles.models import Invitation, invitations
 from cride.users.models import User, Profile
 from cride.circles.models import Circle, Membership
 
@@ -95,11 +95,28 @@ class MemberInvitationsAPITestCase(APITestCase):
         self.token = Token.objects.create(user=self.user).key
         self.client.credentials(HTTP_AUTHORIZATION='Token {}'.format(self.token))
 
-    def test_response_success(self):
-        """Verify request secceed."""
-        url = '/circles/{}/members/{}/invitations/'.format(
+        # URL
+        self.url = '/circles/{}/members/{}/invitations/'.format(
             self.circle.slug_name,
             self.user.username
         )
-        request = self.client.get(url)
+
+    def test_response_success(self):
+        """Verify request secceed."""
+        request = self.client.get(self.url)
         self.assertEqual(request.status_code, status.HTTP_200_OK)
+
+    def test_invitation_creation(self):
+        """Verify invitation are generated if none exist previously."""
+        # Invitations in DB must be 0
+        self.assertEqual(Invitation.objects.count(), 0)
+        
+        # Call member invitations URL
+        request = self.client.get(self.url)
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+
+        # Verify new invitations were created
+        invitations = Invitation.objects.filter(issued_by=self.user)
+        self.assertEqual(invitations.count(), self.membership.remaining_invitations)
+        for invitation in invitations:
+            self.assertIn(invitation.code, request.data['invitations'])
