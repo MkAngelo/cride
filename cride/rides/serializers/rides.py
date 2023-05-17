@@ -144,18 +144,19 @@ class JoinRideSerializer(serializers.ModelSerializer):
         self.context['member'] = membership
         return data
 
+  
     def validate(self, data):
         """Verify rides allow new passengers."""
         ride = self.context['ride']
         if ride.departure_date <= timezone.now():
-            raise serializers.ValidationError("You can't join this ride now.")
-        
+            raise serializers.ValidationError("You can't join this ride now")
+
         if ride.available_seats < 1:
             raise serializers.ValidationError("Ride is already full!")
 
-        if Ride.objects.filter(passengers__pk=data['passenger']):
-            raise serializers.ValidationError("Passenger is already in this trip")
-        
+        if ride.passengers.filter(pk=self.context['user'].pk).exists():
+            raise serializers.ValidationError('Passenger is already in this trip')
+
         return data
 
     def update(self, instance, data):

@@ -91,12 +91,11 @@ class RideViewSet(mixins.CreateModelMixin,
     def join(self, request, *args, **kwargs):
         """Add requesting user to ride."""
         ride = self.get_object()
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(
+        #serializer_class = self.get_serializer_class()  
+        serializer = JoinRideSerializer(
             ride,
-            data={'passenger': request.user.pk},
-            context={'ride': ride, 'circle': self.circle},
-            partial=True
+            data={'passenger': request.user.pk,'available_seats': ride.available_seats - 1},
+            context={'ride': ride, 'circle': self.circle}
         )
         serializer.is_valid(raise_exception=True)
         ride = serializer.save()
